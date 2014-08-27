@@ -612,6 +612,21 @@ FileETag None
 #    RewriteRule ^(.+)\.(\d+)\.(js|css|png|jpg|gif)$ $1.$3 [L]
 # </IfModule>
 
+
+# ------------------------------------------------------------------------------
+# | Robots directive nfor no cache                                             |
+# ------------------------------------------------------------------------------
+
+# You can't instruct all search engines not to index a page, unless you allow them 
+# to access the page. If you block a page with robots.txt, then Google might still 
+# index it if it has a lot of links pointing to it. You need to put the noindex Meta 
+# Robots tag on every page you want to issue that instruction on.
+
+<IfModule mod_headers.c>
+    Header set X-Robots-Tag "noindex, noarchive, nosnippet"
+</IfModule>
+
+
 # ------------------------------------------------------------------------------
 # | File concatenation                                                         |
 # ------------------------------------------------------------------------------
@@ -667,8 +682,21 @@ FileETag None
 
     RewriteCond %{QUERY_STRING} MobileOptOut=2 RewriteRule .* - [L]
 
-    # Mobile user agent check
-    RewriteCond %{HTTP_USER_AGENT} "iPhone|Mobile|iPod|BlackBerry|Opera Mobi|HTC|Silk|iPad|PlayBook|Xoom|GooglebotMobile|MSN Mobile Proxy" [NC]
+    # Mobile UA check
+    # If the browser accepts these mime-types, it's definitely mobile, or pretending to be
+    RewriteCond %{HTTP_ACCEPT} "text\/vnd\.wap\.wml|application\/vnd\.wap\.xhtml\+xml" [NC,OR]
+
+    # Bunch of UA tests
+    RewriteCond %{HTTP_USER_AGENT} "sony|symbian|nokia|samsung|mobile|windows ce|epoc|htc|silk|playbook" [NC,OR]
+    RewriteCond %{HTTP_USER_AGENT} "mini|nitro|j2me|midp-|cldc-|netfront|mot|up\.browser|up\.link|audiovox"[NC,OR]
+    RewriteCond %{HTTP_USER_AGENT} "ericsson,|panasonic|philips|sanyo|sharp|sie-"[NC,OR]
+    RewriteCond %{HTTP_USER_AGENT} "portalmmm|blazer|avantgo|danger|palm|series60|palmsource|pocketpc|xoom|msn\.mobile\.proxy"[NC,OR]
+    RewriteCond %{HTTP_USER_AGENT} "smartphone|rover|ipaq|au-mic,|alcatel|ericy|vodafone\/|wap1\.|wap2\.|iphone|android"[NC,OR]
+    RewriteCond %{HTTP_USER_AGENT} "android|blackberry|iphone|ipod|iemobile|opera mobile|palmos|webos|googlebotmobile|googlebot-mobile" [NC]
+
+    # Note: I've updated the conditions above to skip iPads. However,
+    # mobile safari still reports itself as 'mobile' and thus needs an explicit opt-out
+    RewriteCond %{HTTP_USER_AGENT} !iPad [NC]
 
     # MobileOptOut check
     RewriteCond %{HTTP_COOKIE} !MobileOptOut=1 
