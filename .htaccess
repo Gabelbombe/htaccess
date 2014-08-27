@@ -614,7 +614,7 @@ FileETag None
 
 
 # ------------------------------------------------------------------------------
-# | Robots directive nfor no cache                                             |
+# | Robots directive for no cache                                              |
 # ------------------------------------------------------------------------------
 
 # You can't instruct all search engines not to index a page, unless you allow them 
@@ -710,4 +710,11 @@ FileETag None
 
     # Execute the redirect
     RewriteRule ^(.*)$ http://m.%{HTTP_HOST}%{REQUEST_URI}/$1 [R,L]
+
+    # Send Vary headers to help mobile content crawling
+    # https://developers.google.com/webmasters/smartphone-sites/details
+    <IfModule mod_headers.c>
+        Header append Vary User-Agent
+    </IfModule>
+
 </IfModule>
